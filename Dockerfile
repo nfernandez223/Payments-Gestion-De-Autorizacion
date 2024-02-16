@@ -5,14 +5,16 @@
 
 FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
 WORKDIR /app
-
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
-COPY ["GestionDeAutorizacion.csproj", "."]
-RUN dotnet restore "./GestionDeAutorizacion.csproj"
-COPY . .
-WORKDIR "/src/."
-RUN dotnet build "GestionDeAutorizacion.csproj" -c Release -o /app/build
+WORKDIR /app/src/GestionDeAutorizacion
+COPY src/GestionDeAutorizacion/GestionDeAutorizacion.csproj .
+RUN dotnet restore GestionDeAutorizacion.csproj
+COPY src/Application ../Application
+COPY src/Domain ../Domain
+COPY src/InfraEstructure ../InfraEstructure
+COPY src/GestionDeAutorizacion .
+WORKDIR /app/src/GestionDeAutorizacion
+RUN dotnet build GestionDeAutorizacion.csproj -c Release -o /app/build
 
 FROM build AS publish
 RUN dotnet publish "GestionDeAutorizacion.csproj" -c Release -o /app/publish /p:UseAppHost=false
